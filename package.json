@@ -9,9 +9,11 @@
   "author": "Michael Wood",
   "license": "SEE LICENSE IN license.md",
   "dependencies": {
+    "axios": "^1.6.2",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "http": "^0.0.1-security",
-    "https": "^1.0.0"
+    "https": "^1.0.0",
+    "papaparse": "^5.4.1"
   }
 }

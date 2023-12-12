@@ -9,15 +9,36 @@ const https = require('https');
 const http = require('http');
 const cors = require('cors');
 const fs = require('fs');
+const axios = require('axios');
+const papa = require("papaparse");
+
 
 const app = express();
 app.use(express.static('public'));
 app.use(express.json({limit: '200mb'})); 
 app.use(cors());
 
-app.get('/', (req, res) => {
-    res.send('Hello, World!');
-});
+// app.get('/', (req, res) => {
+//     res.send('Hello, World!');
+// });
+
+const handleGetCsv = async (req, res) => {
+    const { url } = req.body;
+
+    if (!url) return res.status(400).json('bad command');
+    console.log('url', url)
+
+    try {
+        const response = await axios.get(url);
+        const json = papa.parse(response.data)
+        return res.status(200).json(json);
+    } catch(e) {
+        console.error(e);
+        return res.status(500).json('internal server error');
+    }
+
+
+}
 
 const httpsServer = https.createServer({
     key: fs.readFileSync(privateKeyPath),
@@ -29,5 +50,5 @@ const httpsServer = https.createServer({
     console.log(`HTTPS Server running on port ${httpsPort}`);
 });
 
-//http.createServer(app).listen(httpPort, '0.0.0.0');
+app.post('/getCsv', (req, res) => handleGetCsv(req, res))
 
