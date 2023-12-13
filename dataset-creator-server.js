@@ -11,7 +11,7 @@ const cors = require('cors');
 const fs = require('fs');
 const axios = require('axios');
 const papa = require("papaparse");
-
+const ai = require('./utils/ai');
 
 const app = express();
 app.use(express.static('public'));
@@ -40,6 +40,20 @@ const handleGetCsv = async (req, res) => {
 
 }
 
+const handleGetTransformed = async (req, res) => {
+    const { text } = req.body;
+
+    if (!text) return res.status(400).json('bad request');
+
+    try {
+        const transformed = await ai.rewriteAsNewsArticle(text);
+        return res.status(200).json({transformed})
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json('internal server error');
+    }
+}
+
 const httpsServer = https.createServer({
     key: fs.readFileSync(privateKeyPath),
     cert: fs.readFileSync(fullchainPath),
@@ -50,5 +64,6 @@ const httpsServer = https.createServer({
     console.log(`HTTPS Server running on port ${httpsPort}`);
 });
 
-app.post('/getCsv', (req, res) => handleGetCsv(req, res))
+app.post('/getCsv', (req, res) => handleGetCsv(req, res));
+app.post('/getTransformed', (req, res) => handleGetTransformed(req, res));
 
