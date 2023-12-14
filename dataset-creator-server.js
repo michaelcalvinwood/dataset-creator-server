@@ -12,6 +12,7 @@ const fs = require('fs');
 const axios = require('axios');
 const papa = require("papaparse");
 const ai = require('./utils/ai');
+const nlp = require('./utils/nlp');
 
 const app = express();
 app.use(express.static('public'));
@@ -129,8 +130,28 @@ const handleGetSamples = async (req, res) => {
 
     console.log('tokens', tokens);
     
-    const samples = fs.readFileSync('./public/datasets/stripped.json');
-    res.status(200).send(samples)
+    try {
+        const samples = JSON.parse(fs.readFileSync('./public/datasets/stripped.json'));
+        const examples = [];
+        for (let i = 0; i < samples.length; ++i) {
+            const paragraphs = samples[i].split("\n")
+            let text = paragraphs[0] ? paragraphs[0] : '';
+            let curTokens = nlp.numGpt3Tokens(text);
+            for (let j = 1; j < paragraphs.length; ++j) {
+                const newTokens = nlp.numGpt3Tokens(paragraphs[j]);
+                if ((curTokens + newTokens) > tokens) break;
+                text += "\n" + paragraphs[j];
+                curTokens += newTokens;
+            }
+
+            examples.push(text)
+        }
+        res.status(200).send(examples)
+    } catch(e) {
+        console.error(e);
+        return res.status(500).json('internal server error');
+    } 
+
 }
 
 const httpsServer = https.createServer({
