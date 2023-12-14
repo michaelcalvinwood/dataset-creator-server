@@ -22,6 +22,48 @@ app.use(cors());
 //     res.send('Hello, World!');
 // });
 
+const createTransformedVersions = async (start = 1, end = 100) => {
+    const url = 'https://www.michaelcalvinwood.net/datasets/text-data/NewsArticles.csv';
+    const file = './public/datasets/inputs.json';
+
+    let inputs = [];
+    try {
+        inputs = JSON.parse(fs.readFileSync(file))
+    } catch (e) {
+        console.error(e)
+    } 
+
+    // for (let i = 0; i < inputs.length; ++i) console.log(inputs[i].substring(0, 100));
+    // return;
+
+    let numInputs = inputs.length;
+    const next = numInputs + 1;
+
+    if (next > start) start = next;
+    
+    console.log('start', start, 'end', end)
+
+    if (start <= end) {
+        const response = await axios.get(url);
+
+        const orig = papa.parse(response.data).data;
+    
+        for (let i = start; i <= end; ++i) {
+            const text = orig[i][4] ? orig[i][3] + "\n" + orig[i][4] + "\n" + orig[i][5] :  orig[i][3] + "\n" + orig[i][5];
+    
+            const transformed = await ai.rewriteAsNewsArticle(text);
+    
+            console.log(`Transformed ${i}: `, transformed);
+    
+            inputs.push(transformed);
+        }
+    
+        fs.writeFileSync(file, JSON.stringify(inputs), 'utf8');    
+    }
+    
+
+}
+
 const handleGetCsv = async (req, res) => {
     const { url } = req.body;
 
@@ -67,3 +109,4 @@ const httpsServer = https.createServer({
 app.post('/getCsv', (req, res) => handleGetCsv(req, res));
 app.post('/getTransformed', (req, res) => handleGetTransformed(req, res));
 
+createTransformedVersions();

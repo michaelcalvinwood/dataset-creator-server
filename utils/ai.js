@@ -37,7 +37,8 @@ async function turboChatCompletion (prompt, temperature = 0, service = 'You are 
         },
         data: {
             // model: "gpt-3.5-turbo",
-            model: "gpt-3.5-turbo-16k",
+            // model: "gpt-3.5-turbo-16k",
+            model: "gpt-3.5-turbo-1106",
             temperature,
             messages:[
                 {
@@ -124,6 +125,7 @@ exports.chatGPT = async (prompt, temperature = .4) => await getTurboText(prompt,
 exports.chatJSON = async (prompt, temperature = .4) => await getTurboJSON(prompt, temperature);
 
 exports.rewriteAsNewsArticle = async (text) => {
+    // console.log('typeof text', typeof text, text)
     const numTextWords = text.split(' ').length;
     const numResponseWords = Math.floor(.9 * numTextWords);
 
