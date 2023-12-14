@@ -46,7 +46,7 @@ const test = () => {
         stripped.push(paragraphs.join("\n"));
     }
 
-    fs.writeFileSync('./public/datasets/stripped.json', JSON.stringify(stripped));
+    fs.writeFileSync('./public/datasets/stripped.json', JSON.stringify(stripped), 'utf-8');
    
 }
 
@@ -124,6 +124,11 @@ const handleGetTransformed = async (req, res) => {
     }
 }
 
+const handleGetSamples = async (req, res) => {
+    const samples = fs.readFileSync('./public/datasets/stripped.json');
+    res.status(200).send(samples)
+}
+
 const httpsServer = https.createServer({
     key: fs.readFileSync(privateKeyPath),
     cert: fs.readFileSync(fullchainPath),
@@ -136,6 +141,7 @@ const httpsServer = https.createServer({
 
 app.post('/getCsv', (req, res) => handleGetCsv(req, res));
 app.post('/getTransformed', (req, res) => handleGetTransformed(req, res));
+app.get('/getSamples', (req, res) => handleGetSamples(req, res));
 
 //createTransformedVersions();
 test();
