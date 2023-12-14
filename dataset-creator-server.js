@@ -125,6 +125,10 @@ const handleGetTransformed = async (req, res) => {
 }
 
 const handleGetSamples = async (req, res) => {
+    const tokens = req.query.tokens ? Number(req.query.tokens) : 400;
+
+    console.log('tokens', tokens);
+    
     const samples = fs.readFileSync('./public/datasets/stripped.json');
     res.status(200).send(samples)
 }
@@ -144,4 +148,4 @@ app.post('/getTransformed', (req, res) => handleGetTransformed(req, res));
 app.get('/getSamples', (req, res) => handleGetSamples(req, res));
 
 //createTransformedVersions();
-test();
+//test();
