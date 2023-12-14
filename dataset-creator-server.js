@@ -22,6 +22,23 @@ app.use(cors());
 //     res.send('Hello, World!');
 // });
 
+const sentenceEndsWithPunctuation = sentence => {
+    if (!sentence) return false;
+
+    const lastChar = sentence[sentence.length - 1];
+    return !!lastChar.match(/^[.,:!?]/)
+}
+
+const test = () => {
+    const file = './public/datasets/inputs.json';
+    const inputs = JSON.parse(fs.readFileSync(file));
+    const paragraphs = inputs[0].split("\n");
+    for (let i = 0; i < paragraphs.length; ++i) {
+        const result = sentenceEndsWithPunctuation(paragraphs[i]);
+        console.log(`${result}: ${paragraphs[i]}\n\n`)
+    }
+}
+
 const createTransformedVersions = async (start = 1, end = 100) => {
     const url = 'https://www.michaelcalvinwood.net/datasets/text-data/NewsArticles.csv';
     const file = './public/datasets/inputs.json';
@@ -109,4 +126,5 @@ const httpsServer = https.createServer({
 app.post('/getCsv', (req, res) => handleGetCsv(req, res));
 app.post('/getTransformed', (req, res) => handleGetTransformed(req, res));
 
-createTransformedVersions();
+//createTransformedVersions();
+test();
