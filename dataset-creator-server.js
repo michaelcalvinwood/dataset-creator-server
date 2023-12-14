@@ -32,11 +32,22 @@ const sentenceEndsWithPunctuation = sentence => {
 const test = () => {
     const file = './public/datasets/inputs.json';
     const inputs = JSON.parse(fs.readFileSync(file));
-    const paragraphs = inputs[0].split("\n");
-    for (let i = 0; i < paragraphs.length; ++i) {
-        const result = sentenceEndsWithPunctuation(paragraphs[i]);
-        console.log(`${result}: ${paragraphs[i]}\n\n`)
+    const stripped = [];
+
+    for (let i = 0; i < inputs.length; ++i) {
+        const paragraphs = inputs[i].split("\n");
+        const test = sentenceEndsWithPunctuation(paragraphs[0]);
+
+        if (!test) {
+            paragraphs.shift();
+            paragraphs.shift();
+        }
+
+        stripped.push(paragraphs.join("\n"));
     }
+
+    fs.writeFileSync('./public/datasets/stripped.json', JSON.stringify(stripped));
+   
 }
 
 const createTransformedVersions = async (start = 1, end = 100) => {
