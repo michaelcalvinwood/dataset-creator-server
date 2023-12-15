@@ -22,6 +22,18 @@ const configuration = new Configuration(config);
 const openai = new OpenAIApi(configuration);
 const sleep = seconds => new Promise(r => setTimeout(r, seconds * 1000));
 
+exports.uploadFile = async (file) => {
+    try {
+        const response = await openai.createFile(
+        fs.createReadStream(file),
+        "fine-tune"
+        );
+        console.log('File ID: ', response.data.id)
+    } catch (err) {
+        console.log('err: ', err)
+    }
+}
+
 async function turboChatCompletion (prompt, temperature = 0, service = 'You are a helpful, accurate assistant.') {
     /* 
      * NO NEED TO SPECIFY MAX TOKENS

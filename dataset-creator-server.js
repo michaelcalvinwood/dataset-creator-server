@@ -246,6 +246,7 @@ const createJsonl = () => {
         fs.appendFileSync(outFile, JSON.stringify(entry) + "\n", "utf-8");
     }
 
+    //ai.uploadFile(outFile);
 }
 
 createJsonl();
