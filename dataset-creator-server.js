@@ -222,3 +222,30 @@ app.post('/addCsvEntry', (req, res) => handleAddCsvEntry(req, res));
 
 //createTransformedVersions();
 //test();
+
+const createJsonl = () => {
+    const file = '/var/www/nlpkit.net/datasets/pairs.json';
+    const outFile = file + 'l';
+    const pairs = readJsonFile(file);
+    
+    try {
+        fs.unlinkSync(outFile);
+    } catch (e) {
+
+    }
+
+    for (let i = 0; i < pairs.length; ++i) {
+        const entry = {
+            messages: [
+              { role: "system", content: "You are an assistant that replaces all pronouns and coreferences with their references." },
+              { role: "user", content: `For the provided Text, replace pronouns and coreferences with their references.\n\nText:\n${pairs[i].input}` },
+              { role: "assistant", content: pairs[i].output }
+            ]
+        }
+
+        fs.appendFileSync(outFile, JSON.stringify(entry) + "\n", "utf-8");
+    }
+
+}
+
+createJsonl();
