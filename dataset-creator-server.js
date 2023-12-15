@@ -246,7 +246,14 @@ const createJsonl = () => {
         fs.appendFileSync(outFile, JSON.stringify(entry) + "\n", "utf-8");
     }
 
-    //ai.uploadFile(outFile);
+    ai.uploadFile(outFile);
 }
 
-createJsonl();
+const fineTune = async (fileId) => {
+    ai.fineTune(fileId);
+}
+
+//createJsonl();
+
+fineTune('file-anMdbekK3RqAx3hVl63KSjah')
+

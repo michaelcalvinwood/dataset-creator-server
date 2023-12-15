@@ -34,6 +34,45 @@ exports.uploadFile = async (file) => {
     }
 }
 
+exports.fineTune = async (fileId, n_epochs = 10) => {
+
+    const request = {
+        url: `https://api.openai.com/v1/fine_tuning/jobs`,
+        method: 'post',
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.FUSAION_OPENAI_KEY}`
+        },
+        data: {
+            training_file: fileId,
+            model: "gpt-3.5-turbo-0613",
+            hyperparameters: {
+                n_epochs
+            }
+        }
+    }
+
+    try {
+        const response = await axios(request);
+        console.log(response.data);
+    } catch(e) {
+        console.error(e);
+    }
+
+
+    return;
+    try {
+      const response = await openai.createFineTune({
+        training_file: fileId,
+        model: 'gpt-3.5-turbo',
+        n_epochs: 10
+      })
+      console.log('response: ', response)
+    } catch (err) {
+      console.log('error: ', err.response.data.error)
+    }
+  }
+
 async function turboChatCompletion (prompt, temperature = 0, service = 'You are a helpful, accurate assistant.') {
     /* 
      * NO NEED TO SPECIFY MAX TOKENS
