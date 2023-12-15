@@ -23,6 +23,37 @@ app.use(cors());
 //     res.send('Hello, World!');
 // });
 
+const readJsonFile = (file, empty = 'error') => {
+    try {
+        const json = JSON.parse(fs.readFileSync(file));
+        return json;
+    } catch(e) {
+        console.error(e);
+        switch (empty) {
+            case 'error':
+                return false;
+            case 'array':
+                return [];
+            case 'object':
+                return {}
+            case 'string':
+                return ''
+            default:
+                return false;
+        }
+    }
+}
+
+const writeJsonFile = (file, json) => {
+    try {
+        fs.writeFileSync(file, JSON.stringify(json), 'utf-8');
+        return true;
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+}
+
 const sentenceEndsWithPunctuation = sentence => {
     if (!sentence) return false;
 
@@ -154,6 +185,26 @@ const handleGetSamples = async (req, res) => {
 
 }
 
+const handleAddCsvEntry = async (req, res) => {
+    const { input, output, name } = req.body;
+
+    if (!input || !output || !name) return res.status(400).json("bad request");
+
+    const file = '/var/www/nlpkit.net/datasets/pairs.json';
+
+    const pairs = readJsonFile(file, 'array');
+
+    const test = pairs.find(pair => pair.input == input);
+
+    if (test) test.output = output;
+    else pairs.push({input, output});
+
+    writeJsonFile(file, pairs);
+
+    return res.status(200).json('ok');
+
+}
+
 const httpsServer = https.createServer({
     key: fs.readFileSync(privateKeyPath),
     cert: fs.readFileSync(fullchainPath),
@@ -167,6 +218,7 @@ const httpsServer = https.createServer({
 app.post('/getCsv', (req, res) => handleGetCsv(req, res));
 app.post('/getTransformed', (req, res) => handleGetTransformed(req, res));
 app.get('/getSamples', (req, res) => handleGetSamples(req, res));
+app.post('/addCsvEntry', (req, res) => handleAddCsvEntry(req, res));
 
 //createTransformedVersions();
 //test();
